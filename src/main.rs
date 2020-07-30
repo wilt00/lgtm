@@ -17,11 +17,16 @@ struct Dict<'a> {
 async fn index<'a>(data: web::Data<Dict<'a>>) -> impl Responder {
     let mut rng = rand::thread_rng();
     HttpResponse::Ok().body(
-        [(&data.l[..], "let's"), (&data.g[..], "get"), (&data.t[..], "this"), (&data.m[..], "merged")]
-            .iter()
-            .map(|d| *d.0.choose(&mut rng).unwrap_or_else(|| &d.1))
-            .collect::<Vec<&str>>()
-            .join(" "),
+        [
+            (&data.l[..], "let's"),
+            (&data.g[..], "get"),
+            (&data.t[..], "this"),
+            (&data.m[..], "merged"),
+        ]
+        .iter()
+        .map(|d| *d.0.choose(&mut rng).unwrap_or_else(|| &d.1))
+        .collect::<Vec<&str>>()
+        .join(" ") + "\n",
     )
 }
 
