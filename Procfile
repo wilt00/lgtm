@@ -1,1 +1,1 @@
-web: ./target/release/lgtm
+web: ./target/release/lgtm $PORT

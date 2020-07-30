@@ -1,3 +1,4 @@
+use std::env;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use rand::seq::SliceRandom;
 
@@ -26,6 +27,9 @@ async fn index<'a>(data: web::Data<Dict<'a>>) -> impl Responder {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    let args: Vec<String> = env::args().collect();
+    let default_port = String::from("8088");
+    let port = if args.len() > 1 { &args[1] } else  { &default_port };
     HttpServer::new(|| {
         App::new()
             .data(Dict {
@@ -36,7 +40,7 @@ async fn main() -> std::io::Result<()> {
             })
             .route("/", web::get().to(index))
     })
-    .bind("127.0.0.1:8088")?
+    .bind(format!("127.0.0.1:{}", port))?
     .run()
     .await
 }
