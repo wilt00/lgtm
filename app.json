@@ -1,0 +1,6 @@
+{
+    "success_url": "/",
+    "env": {
+      "BUILDPACK_URL": "https://github.com/emk/heroku-buildpack-rust.git"
+    }
+}

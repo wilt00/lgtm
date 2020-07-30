@@ -27,9 +27,12 @@ async fn index<'a>(data: web::Data<Dict<'a>>) -> impl Responder {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let args: Vec<String> = env::args().collect();
     let default_port = String::from("8088");
-    let port = if args.len() > 1 { &args[1] } else  { &default_port };
+    let port = env::var("PORT")
+        .unwrap_or_else(|_| default_port)
+        .parse()
+        .expect("PORT must be a number");
+    println!("Listening on port: {}", port);
     HttpServer::new(|| {
         App::new()
             .data(Dict {
@@ -40,7 +43,7 @@ async fn main() -> std::io::Result<()> {
             })
             .route("/", web::get().to(index))
     })
-    .bind(format!("127.0.0.1:{}", port))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
