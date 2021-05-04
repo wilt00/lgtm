@@ -1,5 +1,10 @@
 use rand::seq::SliceRandom;
 
+static L_INPUT: &str = include_str!("dicts/l.txt");
+static G_INPUT: &str = include_str!("dicts/g.txt");
+static T_INPUT: &str = include_str!("dicts/t.txt");
+static M_INPUT: &str = include_str!("dicts/m.txt");
+
 pub struct Dict<'a> {
     pub l: Vec<&'a str>,
     pub g: Vec<&'a str>,
@@ -7,7 +12,13 @@ pub struct Dict<'a> {
     pub m: Vec<&'a str>,
 }
 
-pub fn lgtm(d: &Dict) -> String {
+pub fn lgtm() -> String {
+    let d: Dict = Dict {
+        l: L_INPUT.split('\n').collect(),
+        g: G_INPUT.split('\n').collect(),
+        t: T_INPUT.split('\n').collect(),
+        m: M_INPUT.split('\n').collect(),
+    };
     let mut rng = rand::thread_rng();
     [
         (&d.l[..], "let's"),
