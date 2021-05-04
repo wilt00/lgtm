@@ -284,6 +284,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "api"
+version = "0.1.0"
+dependencies = [
+ "actix-rt",
+ "actix-web",
+ "lgtm",
+]
+
+[[package]]
 name = "arc-swap"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -417,6 +426,13 @@ dependencies = [
  "num-integer",
  "num-traits",
  "time",
+]
+
+[[package]]
+name = "cli"
+version = "0.1.0"
+dependencies = [
+ "lgtm",
 ]
 
 [[package]]
@@ -818,8 +834,6 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 name = "lgtm"
 version = "0.1.0"
 dependencies = [
- "actix-rt",
- "actix-web",
  "rand",
 ]
 
