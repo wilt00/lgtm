@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Does it look good to you?</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+      integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body,
+      html {
+        height: 100%;
+        display: grid;
+        font-family: "Comfortaa", cursive;
+        background: black;
+        color: white;
+      }
+
+      #app {
+        text-transform: uppercase;
+        user-select: none;
+        cursor: pointer;
+        margin: auto;
+        width: 300px;
+        padding: 20px;
+        box-sizing: border-box;
+        border: 3px solid white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main id="app"></main>
+    <script type="module">
+      import "https://cdn.skypack.dev/@github/typing-effect-element";
+      import init, { lgtm } from "./lgtm/lgtm.js";
+      init().then(() => {
+        const app = document.getElementById("app");
+        const getNewLgtm = () => {
+          const lgtmElement = document.createElement("typing-effect");
+          lgtmElement.innerHTML = `<span data-target="typing-effect.content"></span><span data-target="typing-effect.cursor">|</span>`;
+          lgtmElement.setAttribute(
+            "data-lines",
+            JSON.stringify(lgtm().split(" "))
+          );
+          app.innerHTML = "";
+          app.appendChild(lgtmElement);
+        };
+        app.addEventListener("click", () => {
+          getNewLgtm();
+        });
+        getNewLgtm();
+      });
+    </script>
+  </body>
+</html>
