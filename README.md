@@ -1,5 +1,7 @@
 # lgtm
 
+[![CI](https://github.com/wilt00/lgtm/actions/workflows/build.yml/badge.svg)](https://github.com/wilt00/lgtm/actions/workflows/build.yml)
+
 We've all wondered - what does LGTM stand for? Who can say. Truly, a mystery.
 
 But now, you'll never need to wonder again; generate your very own LGTMs with this, the world's first LGTMaaS platform. 
