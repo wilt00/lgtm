@@ -17,6 +17,8 @@ RUN cargo fetch
 COPY lgtm ./lgtm
 COPY api ./api
 
+RUN cargo test
+
 RUN cargo build --target x86_64-unknown-linux-musl -p api --release
 
 FROM scratch as api
