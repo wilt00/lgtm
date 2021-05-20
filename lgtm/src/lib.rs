@@ -31,3 +31,27 @@ pub fn lgtm() -> String {
     .collect::<Vec<&str>>()
     .join(" ")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::lgtm;
+
+    #[test]
+    fn lgtm_test() {
+        let line = lgtm();
+        
+        // Check empty string
+        assert_ne!(line.len(), 0);
+
+        let words: Vec<&str> = line.split(' ').collect();
+
+        // Check four words
+        assert_eq!(words.len(), 4);
+
+        // check first characters of words
+        assert_eq!(words[0].chars().nth(0).unwrap(), 'l');
+        assert_eq!(words[1].chars().nth(0).unwrap(), 'g');
+        assert_eq!(words[2].chars().nth(0).unwrap(), 't');
+        assert_eq!(words[3].chars().nth(0).unwrap(), 'm');
+    }
+}
