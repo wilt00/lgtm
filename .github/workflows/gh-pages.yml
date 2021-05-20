@@ -1,0 +1,29 @@
+name: GH Pages
+on:
+  push:
+    branches:
+      - main
+jobs:
+  gh-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false 
+      - name: Setup wasm-pack 🦀
+        uses: jetli/wasm-pack-action@v0.3.0
+        with:
+          version: 'latest'
+      - name: Build Wasm 🚧
+        run: |
+          wasm-pack build --target web -d ../web/lgtm lgtm
+          rm web/lgtm/.gitignore
+      - name: Deploy to GitHub Pages 🚀
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: web
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

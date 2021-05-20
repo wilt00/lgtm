@@ -1,3 +1,4 @@
+use wasm_bindgen::prelude::*;
 use rand::seq::SliceRandom;
 
 static L_INPUT: &str = include_str!("dicts/l.txt");
@@ -12,6 +13,7 @@ pub struct Dict<'a> {
     pub m: Vec<&'a str>,
 }
 
+#[wasm_bindgen]
 pub fn lgtm() -> String {
     let d: Dict = Dict {
         l: L_INPUT.split('\n').collect(),
