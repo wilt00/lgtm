@@ -14,4 +14,6 @@ $ curl lgtm.halsted.space
 
 Fresh LGTMs served up piping hot, on demand, as soon as the Heroku free tier dyno spins up. Give it a sec. You think I'm spending money on this?
 
+Also now available right here on the World Wide Web, in shiny Webassembly form, at https://wilt00.github.io/lgtm/ (thanks [@bmiddha](https://github.com/bmiddha)!)
+
 Words lists are compiled by Infochimps, via https://github.com/dwyl/english-words
