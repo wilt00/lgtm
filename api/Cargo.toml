@@ -8,6 +8,10 @@ edition = "2018"
 
 [dependencies]
 
-actix-rt = "1.0"
-actix-web = "2.0"
+actix-web = "3.3"
+envy = "0.4"
+serde = "1.0"
 lgtm = { path = "../lgtm" }
+
+[dev-dependencies]
+actix-rt = "2"
