@@ -4,15 +4,9 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="thinking.svg" type="image/x-icon" />
+    <title>LGTM?</title>
 
-    <title>LGTM? 🤔</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-      integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
-      crossorigin="anonymous"
-    />
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap"
@@ -20,50 +14,345 @@
     />
 
     <style>
+      :root {
+        --bg: black;
+        --fg: white;
+      }
+
       body,
       html {
+        margin: 0;
+        padding: 0;
         height: 100%;
-        display: grid;
-        font-family: "Comfortaa", cursive;
-        background: black;
-        color: white;
+      }
+
+      body {
+        font-family: "Comfortaa", sans-serif;
+        background: var(--bg);
+        color: var(--fg);
       }
 
       #app {
-        text-transform: uppercase;
-        user-select: none;
-        cursor: pointer;
+        display: grid;
+        height: 100%;
+      }
+
+      .wrapper {
         margin: auto;
-        width: 300px;
+      }
+
+      .lgtm-box {
+        margin: auto;
+        width: 350px;
         padding: 20px;
+        height: 225px;
         box-sizing: border-box;
-        border: 3px solid white;
+        border: 3px solid var(--fg);
+        position: relative;
+      }
+
+      .lgtm-controls {
+        margin: 10px auto;
+        width: 350px;
+        box-sizing: border-box;
+      }
+
+      .lgtm-controls select {
+        height: 35px;
+      }
+
+      .lgtm-controls button {
+        border: none;
+        background-color: unset;
+        color: inherit;
+        cursor: pointer;
+        padding: 5px;
+        height: 35px;
+      }
+
+      .lgtm-controls button svg {
+        height: 25px;
+      }
+
+      .lgtm-text {
+        word-spacing: 100vw;
+      }
+
+      .alert {
+        position: fixed;
+        padding: 10px;
+        width: 300px;
+        bottom: 0;
+        right: 0;
+        text-align: right;
+      }
+
+      .header {
+        position: absolute;
+        margin: 0;
+        bottom: 0;
+        right: 20px;
+        user-select: none;
+      }
+
+      canvas {
+        display: none;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: black;
+          --fg: white;
+        }
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: white;
+          --fg: black;
+        }
       }
     </style>
   </head>
 
   <body>
-    <main id="app"></main>
+    <div id="app"></div>
     <script type="module">
-      import "https://cdn.skypack.dev/@github/typing-effect-element";
+      import { h, render, Fragment } from "https://cdn.skypack.dev/preact";
+      import {
+        useEffect,
+        useState,
+      } from "https://cdn.skypack.dev/preact/hooks";
+      import htm from "https://cdn.skypack.dev/htm";
       import init, { lgtm } from "./lgtm/lgtm.js";
-      init().then(() => {
-        const app = document.getElementById("app");
-        const getNewLgtm = () => {
-          const lgtmElement = document.createElement("typing-effect");
-          lgtmElement.innerHTML = `<span data-target="typing-effect.content"></span><span data-target="typing-effect.cursor">|</span>`;
-          lgtmElement.setAttribute(
-            "data-lines",
-            JSON.stringify(lgtm().split(" "))
+      import html2canvas from "https://cdn.skypack.dev/html2canvas";
+
+      const html = htm.bind(h);
+
+      const TypingEffect = ({ text }) => {
+        const [display, setDisplay] = useState("");
+        const typingIntervalTime = 50;
+        let counter = 0;
+
+        useEffect(() => {
+          const typingInterval = setInterval(() => {
+            setDisplay(text.substring(0, counter));
+            counter++;
+            if (counter > text.length) {
+              clearInterval(typingInterval);
+            }
+          }, typingIntervalTime);
+          return () => {
+            clearInterval(typingInterval);
+          };
+        }, [text]);
+
+        return html`<h2>${display}</h2>`;
+      };
+
+      const CopyMenu = ({ onCopy }) => {
+        return html`
+          <button
+            onclick=${() => onCopy("TEXT")}
+            aria-label="Copy text to clipboard"
+          >
+            <${CopyIcon} />
+          </button>
+          <button
+            onclick=${() => onCopy("IMAGE")}
+            aria-label="Copy image to clipboard"
+          >
+            <${PictureIcon} />
+          </button>
+        `;
+      };
+
+      const RerollBtn = ({ onReroll }) => {
+        return html`
+          <button onclick=${onReroll} aria-label="Reroll">
+            <${RedoIcon} />
+          </button>
+        `;
+      };
+
+      const Loading = () => {
+        return html`Loading ... `;
+      };
+
+      const CopyIcon = () => html`
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          data-prefix="far"
+          data-icon="copy"
+          class="svg-inline--fa fa-copy fa-w-14"
+          role="img"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 448 512"
+        >
+          <path
+            fill="currentColor"
+            d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"
+          ></path>
+        </svg>
+      `;
+
+      const RedoIcon = () =>
+        html`
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fas"
+            data-icon="redo"
+            class="svg-inline--fa fa-redo fa-w-16"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="currentColor"
+              d="M500.33 0h-47.41a12 12 0 0 0-12 12.57l4 82.76A247.42 247.42 0 0 0 256 8C119.34 8 7.9 119.53 8 256.19 8.1 393.07 119.1 504 256 504a247.1 247.1 0 0 0 166.18-63.91 12 12 0 0 0 .48-17.43l-34-34a12 12 0 0 0-16.38-.55A176 176 0 1 1 402.1 157.8l-101.53-4.87a12 12 0 0 0-12.57 12v47.41a12 12 0 0 0 12 12h200.33a12 12 0 0 0 12-12V12a12 12 0 0 0-12-12z"
+            ></path>
+          </svg>
+        `;
+
+      const PictureIcon = () =>
+        html`
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="far"
+            data-icon="images"
+            class="svg-inline--fa fa-images fa-w-18"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 576 512"
+          >
+            <path
+              fill="currentColor"
+              d="M480 416v16c0 26.51-21.49 48-48 48H48c-26.51 0-48-21.49-48-48V176c0-26.51 21.49-48 48-48h16v48H54a6 6 0 0 0-6 6v244a6 6 0 0 0 6 6h372a6 6 0 0 0 6-6v-10h48zm42-336H150a6 6 0 0 0-6 6v244a6 6 0 0 0 6 6h372a6 6 0 0 0 6-6V86a6 6 0 0 0-6-6zm6-48c26.51 0 48 21.49 48 48v256c0 26.51-21.49 48-48 48H144c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h384zM264 144c0 22.091-17.909 40-40 40s-40-17.909-40-40 17.909-40 40-40 40 17.909 40 40zm-72 96l39.515-39.515c4.686-4.686 12.284-4.686 16.971 0L288 240l103.515-103.515c4.686-4.686 12.284-4.686 16.971 0L480 208v80H192v-48z"
+            ></path>
+          </svg>
+        `;
+
+      const Alert = ({ text }) => {
+        return html`<div class="alert">${text}</div>`;
+      };
+
+      const Header = () => {
+        return html`<div class="header"><h1>lgtm</h1></div>`;
+      };
+
+      const App = () => {
+        const [loading, setLoading] = useState(undefined);
+        const [text, setText] = useState(undefined);
+        const [effectEnabled, setEffectEnabled] = useState(true);
+        const [darkMode, setDarkMode] = useState(false);
+        const [alert, setAlert] = useState(undefined);
+        const alertTimeout = 2000;
+
+        useEffect(() => {
+          const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
           );
-          app.innerHTML = "";
-          app.appendChild(lgtmElement);
+          setEffectEnabled(!reducedMotion.matches);
+          reducedMotion.addEventListener("change", () => {
+            setEffectEnabled(!reducedMotion.matches);
+          });
+
+          const preferredColorScheme = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          );
+          setDarkMode(preferredColorScheme.matches);
+          preferredColorScheme.addEventListener("change", () => {
+            setDarkMode(preferredColorScheme.matches);
+          });
+        }, []);
+
+        useEffect(() => {
+          setLoading(true);
+          init().then(() => {
+            setLoading(false);
+            newLgtm();
+          });
+        }, []);
+
+        useEffect(() => {
+          if (alert) {
+            setTimeout(() => setAlert(undefined), alertTimeout);
+          }
+        }, [alert]);
+
+        const newLgtm = () => {
+          setText(lgtm());
         };
-        app.addEventListener("click", () => {
-          getNewLgtm();
-        });
-        getNewLgtm();
-      });
+
+        const onCopy = (type) => {
+          const copyText = () => {
+            navigator.clipboard
+              .writeText(text)
+              .then(() => {
+                setAlert("Copied to clipboard");
+              })
+              .catch(() => {
+                setAlert("Failed to copy to clipboard");
+              });
+          };
+
+          const copyImage = () => {
+            html2canvas(document.getElementById("lgtm-box")).then(function (
+              canvas
+            ) {
+              document.body.appendChild(canvas);
+              canvas.toBlob(function (blob) {
+                const item = new ClipboardItem({ "image/png": blob });
+                navigator.clipboard
+                  .write([item])
+                  .then(() => {
+                    setAlert("Copied to clipboard");
+                    canvas.remove();
+                  })
+                  .catch(() => {
+                    setAlert("Failed to copy to clipboard");
+                    canvas.remove();
+                  });
+              });
+            });
+          };
+
+          switch (type) {
+            case "IMAGE":
+              copyImage();
+              break;
+            case "TEXT":
+              copyText();
+          }
+        };
+
+        return html`
+          <div class="wrapper">
+            <div id="lgtm-box" class="lgtm-box">
+              <${Header} />
+              ${loading
+                ? html`<${Loading} />`
+                : html`
+                    <div class="lgtm-text">
+                      ${effectEnabled
+                        ? html`<${TypingEffect} text="${text}" />`
+                        : html`<h2>${text}</h2>`}
+                    </div>
+                  `}
+            </div>
+            <div class="lgtm-controls">
+              <${CopyMenu} onCopy=${onCopy} />
+              <${RerollBtn} onReroll=${newLgtm} />
+            </div>
+          </div>
+          ${alert && html`<${Alert} text=${alert} />`}
+        `;
+      };
+
+      render(html`<${App} />`, document.getElementById("app"));
     </script>
   </body>
 </html>
