@@ -9,14 +9,14 @@
 
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Comfortaa&family=Montserrat&display=swap"
       rel="stylesheet"
     />
 
     <style>
       :root {
-        --bg: black;
-        --fg: white;
+        --bg: #000;
+        --fg: #fff;
       }
 
       body,
@@ -26,8 +26,17 @@
         height: 100%;
       }
 
-      body {
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
         font-family: "Comfortaa", sans-serif;
+      }
+
+      body {
+        font-family: "Montserrat", sans-serif;
         background: var(--bg);
         color: var(--fg);
       }
@@ -35,6 +44,58 @@
       #app {
         display: grid;
         height: 100%;
+      }
+
+      .tooltip {
+        display: inline-block;
+        background: var(--fg);
+        color: var(--bg);
+        font-weight: bold;
+        padding: 5px 10px;
+        font-size: 13px;
+        border-radius: 4px;
+      }
+
+      .tooltip-arrow,
+      .tooltip-arrow::before {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: inherit;
+      }
+
+      .tooltip-arrow {
+        visibility: hidden;
+      }
+
+      .tooltip-arrow::before {
+        visibility: visible;
+        content: "";
+        transform: rotate(45deg);
+      }
+
+      .tooltip[data-popper-placement^="top"] > .tooltip-arrow {
+        bottom: -4px;
+      }
+
+      .tooltip[data-popper-placement^="bottom"] > .tooltip-arrow {
+        top: -4px;
+      }
+
+      .tooltip[data-popper-placement^="left"] > .tooltip-arrow {
+        right: -4px;
+      }
+
+      .tooltip[data-popper-placement^="right"] > .tooltip-arrow {
+        left: -4px;
+      }
+
+      .tooltip {
+        display: none;
+      }
+
+      .tooltip[data-show] {
+        display: block;
       }
 
       .wrapper {
@@ -67,11 +128,18 @@
         color: inherit;
         cursor: pointer;
         padding: 5px;
-        height: 35px;
+        height: 45px;
+        width: 45px;
+        border: 0;
+      }
+
+      .lgtm-controls button:hover {
+        border: 3px solid var(--fg);
       }
 
       .lgtm-controls button svg {
         height: 25px;
+        max-width: 100%;
       }
 
       .lgtm-text {
@@ -101,15 +169,15 @@
 
       @media (prefers-color-scheme: dark) {
         :root {
-          --bg: black;
-          --fg: white;
+          --bg: #000;
+          --fg: #fff;
         }
       }
 
       @media (prefers-color-scheme: light) {
         :root {
-          --bg: white;
-          --fg: black;
+          --bg: #fff;
+          --fg: #000;
         }
       }
     </style>
@@ -122,10 +190,13 @@
       import {
         useEffect,
         useState,
+        useRef,
       } from "https://cdn.skypack.dev/preact/hooks";
       import htm from "https://cdn.skypack.dev/htm";
       import init, { lgtm } from "./lgtm/lgtm.js";
       import html2canvas from "https://cdn.skypack.dev/html2canvas";
+      import { createPopper } from "https://cdn.skypack.dev/@popperjs/core";
+      import uniqueId from "https://cdn.skypack.dev/lodash.uniqueid";
 
       const html = htm.bind(h);
 
@@ -148,31 +219,6 @@
         }, [text]);
 
         return html`<h2>${display}</h2>`;
-      };
-
-      const CopyMenu = ({ onCopy }) => {
-        return html`
-          <button
-            onclick=${() => onCopy("TEXT")}
-            aria-label="Copy text to clipboard"
-          >
-            <${CopyIcon} />
-          </button>
-          <button
-            onclick=${() => onCopy("IMAGE")}
-            aria-label="Copy image to clipboard"
-          >
-            <${PictureIcon} />
-          </button>
-        `;
-      };
-
-      const RerollBtn = ({ onReroll }) => {
-        return html`
-          <button onclick=${onReroll} aria-label="Reroll">
-            <${RedoIcon} />
-          </button>
-        `;
       };
 
       const Loading = () => {
@@ -241,6 +287,76 @@
 
       const Header = () => {
         return html`<div class="header"><h1>lgtm</h1></div>`;
+      };
+
+      const IconButtonWithTooltip = ({ onClick, label, icon }) => {
+        const btnRef = useRef();
+        const tipRef = useRef();
+        const tooltipId = uniqueId();
+        let popperInstance;
+
+        useEffect(() => {
+          if (btnRef.current && tipRef.current) {
+            popperInstance = createPopper(btnRef.current, tipRef.current, {
+              placement: "bottom",
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: [0, 8],
+                  },
+                },
+              ],
+            });
+
+            const showTooltip = () => {
+              tipRef.current.setAttribute("data-show", "");
+              popperInstance.update();
+            };
+            const hideTooltip = () => {
+              tipRef.current.removeAttribute("data-show");
+            };
+
+            btnRef.current.addEventListener("mouseenter", showTooltip);
+            btnRef.current.addEventListener("focus", showTooltip);
+            btnRef.current.addEventListener("mouseleave", hideTooltip);
+            btnRef.current.addEventListener("blur", hideTooltip);
+          }
+        }, [btnRef, tipRef]);
+        return html`
+          <button
+            ref=${btnRef}
+            onclick=${onClick}
+            aria-describedby=${tooltipId}
+          >
+            ${icon}
+          </button>
+          <div role="tooltip" class="tooltip" id=${tooltipId} ref=${tipRef}>
+            ${label}
+            <div class="toolip-arrow" data-popper-arrow></div>
+          </div>
+        `;
+      };
+
+      const LgtmControls = ({ onCopy, onReroll }) => {
+        return html`
+          <div class="lgtm-controls">
+            <${IconButtonWithTooltip}
+              onClick=${() => onCopy("TEXT")}
+              label="Copy text to clipboard"
+              icon=${html`<${CopyIcon} />`}
+            />
+            <${IconButtonWithTooltip}
+              onClick=${() => onCopy("IMAGE")}
+              label="Copy image to clipboard"
+              icon=${html`<${PictureIcon} />`}
+            /><${IconButtonWithTooltip}
+              onClick=${onReroll}
+              label="New LGTM"
+              icon=${html`<${RedoIcon} />`}
+            />
+          </div>
+        `;
       };
 
       const App = () => {
@@ -343,10 +459,7 @@
                     </div>
                   `}
             </div>
-            <div class="lgtm-controls">
-              <${CopyMenu} onCopy=${onCopy} />
-              <${RerollBtn} onReroll=${newLgtm} />
-            </div>
+            <${LgtmControls} onCopy="${onCopy}" onReroll="${newLgtm}" />
           </div>
           ${alert && html`<${Alert} text=${alert} />`}
         `;
