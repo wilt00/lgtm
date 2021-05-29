@@ -22,7 +22,7 @@ Words lists are compiled by Infochimps, via https://github.com/dwyl/english-word
 
 ### Rust
 
-The rust code is separated in to 3 cargo workspaces.
+The rust code is separated into 3 cargo workspaces:
 
 - `api` - HTTP API that returns plain text `lgtm` responses.
 - `lgtm` - Library used by other projects (`api`, `cli`, `web`) to generate `lgtm`s.
