@@ -28,7 +28,7 @@ The rust code is separated into 3 cargo workspaces:
 - `lgtm` - Library used by other projects (`api`, `cli`, `web`) to generate `lgtm`s.
 - `cli` - Binary that prints `lgtm` to STDOUT.
 
-All projects can be built, and tested from the root of the repo using `cargo build` and `cargo test`. Projects can also be individually interacted with by navigating to their dirs and running `cargo` commands or by passing the `-p` flag. For more information about cargo workspaces, refer to the [documentation](https://doc.rust-lang.org/cargo/reference/workspaces.html).
+All projects can be built and tested from the root of the repo using `cargo build` and `cargo test`. Projects can also be individually interacted with by navigating to their directories and running `cargo` commands or by passing the `-p` flag. For more information about cargo workspaces, refer to the [documentation](https://doc.rust-lang.org/cargo/reference/workspaces.html).
 
 ### Wasm
 
