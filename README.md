@@ -34,7 +34,7 @@ All projects can be built and tested from the root of the repo using `cargo buil
 
 The `lgtm` library is also built to WebAssembly to be used in the `web` project.
 
-`wasm-pack` is needed to build. Available from [here](https://rustwasm.github.io/).
+`wasm-pack` is needed to build, available [here](https://rustwasm.github.io/).
 
 ### Web
 
