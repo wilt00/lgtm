@@ -1,0 +1,37 @@
+name: test prod website
+on:
+  schedule:
+    # 12 PM UTC every day
+    - cron: 0 12 * * *
+  workflow_call:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Setup node 🔧
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          cache: "yarn"
+          cache-dependency-path: tests/yarn.lock
+      - name: Setup playwright ⚙️
+        uses: microsoft/playwright-github-action@v1
+      - name: Setup playwright - browsers ⚙️
+        run: npx playwright install                                              
+      - name: Install Dependencies 📦
+        run: |
+          pushd tests
+          yarn install
+          popd
+      - name: Run Tests 🧪
+        run: |
+          pushd tests
+          yarn test
+          popd
+        env:
+          TEST_URL: https://wilt00.github.io/lgtm

@@ -338,7 +338,12 @@
           >
         </div>`;
 
-      const IconButtonWithTooltip = ({ onClick, label, icon }) => {
+      const IconButtonWithTooltip = ({
+        onClick,
+        label,
+        icon,
+        automationId,
+      }) => {
         const btnRef = useRef();
         const tipRef = useRef();
         const tooltipId = uniqueId();
@@ -377,6 +382,7 @@
             ref=${btnRef}
             onclick=${onClick}
             aria-describedby=${tooltipId}
+            data-automation-id=${automationId}
           >
             ${icon}
           </button>
@@ -391,15 +397,18 @@
         return html`
           <div class="lgtm-controls">
             <${IconButtonWithTooltip}
+              automationId="copyText"
               onClick=${() => onCopy("TEXT")}
               label="Copy text to clipboard"
               icon=${html`<${CopyIcon} />`}
             />
             <${IconButtonWithTooltip}
+              automationId="copyImage"
               onClick=${() => onCopy("IMAGE")}
               label="Copy image to clipboard"
               icon=${html`<${PictureIcon} />`}
             /><${IconButtonWithTooltip}
+              automationId="reroll"
               onClick=${onReroll}
               label="New LGTM"
               icon=${html`<${RedoIcon} />`}
