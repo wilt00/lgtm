@@ -10,11 +10,11 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
         with:
-          persist-credentials: false 
+          persist-credentials: false
       - name: Setup wasm-pack 🦀
         uses: jetli/wasm-pack-action@v0.3.0
         with:
-          version: 'latest'
+          version: latest
       - name: Build Wasm 🚧
         run: |
           wasm-pack build --target web -d ../web/lgtm lgtm
@@ -27,3 +27,7 @@ jobs:
           build_dir: web
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  test-prod:
+    needs:
+      - gh-pages
+    uses: wilt00/lgtm/.github/workflows/test-prod.yml@main
