@@ -1,6 +1,6 @@
 # lgtm
 
-[![CI](https://github.com/wilt00/lgtm/actions/workflows/build.yml/badge.svg)](https://github.com/wilt00/lgtm/actions/workflows/build.yml) [![LGTM](https://github.com/bmiddha/lgtm/actions/workflows/lgtm.yml/badge.svg)](https://github.com/bmiddha/lgtm/actions/workflows/lgtm.yml)
+[![CI](https://github.com/wilt00/lgtm/actions/workflows/build.yml/badge.svg)](https://github.com/wilt00/lgtm/actions/workflows/build.yml) [![LGTM](https://github.com/wilt00/lgtm/actions/workflows/lgtm.yml/badge.svg)](https://github.com/wilt00/lgtm/actions/workflows/lgtm.yml)
 
 We've all wondered - what does LGTM stand for? Who can say. Truly, a mystery.
 
