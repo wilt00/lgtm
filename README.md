@@ -64,6 +64,6 @@ cargo build
 # same commands apply for testing, replace build with test
 ```
 
-## Using lgtm in a workflows
+## Using lgtm in workflows
 
 This repo uses ltgm in a GitHub action. Checkout [.github/workflows/lgtm.yml](.github/workflows/lgtm.yml).
