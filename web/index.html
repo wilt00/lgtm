@@ -11,6 +11,7 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Comfortaa&family=Montserrat&display=swap"
       rel="stylesheet"
+      crossorigin="anonymous"
     />
 
     <style>
@@ -210,17 +211,17 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import { h, render, Fragment } from "https://cdn.skypack.dev/preact";
+      import { h, render, Fragment } from "https://cdn.skypack.dev/pin/preact@v10.6.5-dh92xYYR7rWjXDVdf68m/mode=imports,min/optimized/preact.js";
       import {
         useEffect,
         useState,
         useRef,
-      } from "https://cdn.skypack.dev/preact/hooks";
-      import htm from "https://cdn.skypack.dev/htm";
+      } from "https://cdn.skypack.dev/pin/preact@v10.6.5-dh92xYYR7rWjXDVdf68m/mode=imports,min/optimized/preact/hooks.js";
+      import htm from "https://cdn.skypack.dev/pin/htm@v3.1.0-GfbFayS9fb6XpfZ6otqZ/mode=imports,min/optimized/htm.js";
+      import html2canvas from "https://cdn.skypack.dev/pin/html2canvas@v1.4.1-nmvqO7O7iJYUeD1CdMlZ/mode=imports,min/optimized/html2canvas.js";
+      import { createPopper } from "https://cdn.skypack.dev/pin/@popperjs/core@v2.11.2-jrjeSetLEOk3T0AMV5X6/mode=imports,min/optimized/@popperjs/core.js";
+      import uniqueId from "https://cdn.skypack.dev/pin/lodash.uniqueid@v4.0.1-sxw8p6iCoRtblkA4oMxg/mode=imports,min/optimized/lodash.uniqueid.js";
       import init, { lgtm } from "./lgtm/lgtm.js";
-      import html2canvas from "https://cdn.skypack.dev/html2canvas";
-      import { createPopper } from "https://cdn.skypack.dev/@popperjs/core";
-      import uniqueId from "https://cdn.skypack.dev/lodash.uniqueid";
 
       const html = htm.bind(h);
 

@@ -1,9 +1,11 @@
 {
   "name": "tests",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "serve": "serve ../web"
   },
   "devDependencies": {
-    "@playwright/test": "^1.16.3"
+    "@playwright/test": "1.16.3",
+    "serve": "13.0.2"
   }
 }
