@@ -3,14 +3,13 @@ on:
   pull_request_review:
     types: [submitted]
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   approved:
     if: github.event.review.state == 'approved'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout 🛎
         uses: actions/checkout@v2
