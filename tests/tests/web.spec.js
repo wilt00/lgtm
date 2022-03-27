@@ -1,6 +1,6 @@
 const { test, expect } = require("@playwright/test");
 
-const url = process.env.TEST_URL || "http://localhost:5000";
+const url = process.env.TEST_URL || "http://localhost:3000";
 
 test("test lgtm", async ({ page }) => {
   await page.goto(url);
