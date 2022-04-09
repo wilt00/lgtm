@@ -1,6 +1,6 @@
 # lgtm
 
-[![CI](https://github.com/wilt00/lgtm/actions/workflows/build.yml/badge.svg)](https://github.com/wilt00/lgtm/actions/workflows/build.yml)
+[![CI](https://github.com/wilt00/lgtm/actions/workflows/build.yml/badge.svg)](https://github.com/wilt00/lgtm/actions/workflows/build.yml) [![LGTM](https://github.com/wilt00/lgtm/actions/workflows/lgtm.yml/badge.svg)](https://github.com/wilt00/lgtm/actions/workflows/lgtm.yml)
 
 We've all wondered - what does LGTM stand for? Who can say. Truly, a mystery.
 
@@ -63,3 +63,7 @@ cargo build
 
 # same commands apply for testing, replace build with test
 ```
+
+## Using lgtm in workflows
+
+This repo uses ltgm in a GitHub action. Checkout [.github/workflows/lgtm.yml](.github/workflows/lgtm.yml).
