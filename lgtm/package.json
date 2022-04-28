@@ -1,0 +1,16 @@
+{
+  "name": "lgtm",
+  "collaborators": [
+    "Will Toher <will.toher.0@gmail.com>",
+    "Bharat Middha <5100938+bmiddha@users.noreply.github.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "lgtm_bg.wasm",
+    "lgtm.js",
+    "lgtm.d.ts"
+  ],
+  "module": "lgtm.js",
+  "types": "lgtm.d.ts",
+  "sideEffects": false
+}

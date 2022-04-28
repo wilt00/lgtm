@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="thinking.svg" type="image/x-icon" />
+    <title>LGTM?</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comfortaa&family=Montserrat&display=swap"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      :root {
+        --bg: #000;
+        --fg: #fff;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Comfortaa", sans-serif;
+      }
+
+      body {
+        font-family: "Montserrat", sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      #app {
+        display: grid;
+        height: 100%;
+      }
+
+      .tooltip {
+        display: inline-block;
+        background: var(--fg);
+        color: var(--bg);
+        font-weight: bold;
+        padding: 5px 10px;
+        font-size: 13px;
+        border-radius: 4px;
+      }
+
+      .tooltip-arrow,
+      .tooltip-arrow::before {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: inherit;
+      }
+
+      .tooltip-arrow {
+        visibility: hidden;
+      }
+
+      .tooltip-arrow::before {
+        visibility: visible;
+        content: "";
+        transform: rotate(45deg);
+      }
+
+      .tooltip[data-popper-placement^="top"] > .tooltip-arrow {
+        bottom: -4px;
+      }
+
+      .tooltip[data-popper-placement^="bottom"] > .tooltip-arrow {
+        top: -4px;
+      }
+
+      .tooltip[data-popper-placement^="left"] > .tooltip-arrow {
+        right: -4px;
+      }
+
+      .tooltip[data-popper-placement^="right"] > .tooltip-arrow {
+        left: -4px;
+      }
+
+      .tooltip {
+        display: none;
+      }
+
+      .tooltip[data-show] {
+        display: block;
+      }
+
+      .wrapper {
+        margin: auto;
+      }
+
+      .lgtm-box {
+        margin: auto;
+        width: 350px;
+        padding: 20px;
+        height: 225px;
+        box-sizing: border-box;
+        border: 3px solid var(--fg);
+        position: relative;
+      }
+
+      .lgtm-controls {
+        margin: 10px auto;
+        width: 350px;
+        box-sizing: border-box;
+      }
+
+      .lgtm-controls select {
+        height: 35px;
+      }
+
+      .lgtm-controls button {
+        border: none;
+        background-color: unset;
+        color: inherit;
+        cursor: pointer;
+        padding: 5px;
+        height: 45px;
+        width: 45px;
+        border: 0;
+      }
+
+      .lgtm-controls button:hover {
+        border: 3px solid var(--fg);
+      }
+
+      .lgtm-controls button svg {
+        height: 25px;
+        max-width: 100%;
+      }
+
+      .lgtm-text {
+        word-spacing: 100vw;
+      }
+
+      .alert {
+        position: fixed;
+        padding: 10px;
+        width: 300px;
+        bottom: 10px;
+        right: 10px;
+        text-align: right;
+      }
+
+      .header {
+        position: absolute;
+        margin: 0;
+        bottom: 0;
+        right: 20px;
+        user-select: none;
+      }
+
+      canvas {
+        display: none;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .gh-plug {
+        margin-bottom: 10px;
+      }
+
+      .gh-plug a {
+        display: flex;
+        align-items: center;
+        height: 25px;
+      }
+
+      .gh-plug svg {
+        height: 25px;
+        margin-right: 5px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #000;
+          --fg: #fff;
+        }
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #fff;
+          --fg: #000;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import { h, render, Fragment } from "https://cdn.skypack.dev/pin/preact@v10.6.5-dh92xYYR7rWjXDVdf68m/mode=imports,min/optimized/preact.js";
+      import {
+        useEffect,
+        useState,
+        useRef,
+      } from "https://cdn.skypack.dev/pin/preact@v10.6.5-dh92xYYR7rWjXDVdf68m/mode=imports,min/optimized/preact/hooks.js";
+      import htm from "https://cdn.skypack.dev/pin/htm@v3.1.0-GfbFayS9fb6XpfZ6otqZ/mode=imports,min/optimized/htm.js";
+      import html2canvas from "https://cdn.skypack.dev/pin/html2canvas@v1.4.1-nmvqO7O7iJYUeD1CdMlZ/mode=imports,min/optimized/html2canvas.js";
+      import { createPopper } from "https://cdn.skypack.dev/pin/@popperjs/core@v2.11.2-jrjeSetLEOk3T0AMV5X6/mode=imports,min/optimized/@popperjs/core.js";
+      import uniqueId from "https://cdn.skypack.dev/pin/lodash.uniqueid@v4.0.1-sxw8p6iCoRtblkA4oMxg/mode=imports,min/optimized/lodash.uniqueid.js";
+      import init, { lgtm } from "./lgtm/lgtm.js";
+
+      const html = htm.bind(h);
+
+      const TypingEffect = ({ text }) => {
+        const [display, setDisplay] = useState("");
+        const typingIntervalTime = 50;
+        let counter = 0;
+
+        useEffect(() => {
+          const typingInterval = setInterval(() => {
+            setDisplay(text.substring(0, counter));
+            counter++;
+            if (counter > text.length) {
+              clearInterval(typingInterval);
+            }
+          }, typingIntervalTime);
+          return () => {
+            clearInterval(typingInterval);
+          };
+        }, [text]);
+
+        return html`<h2>${display}</h2>`;
+      };
+
+      const Loading = () => {
+        return html`Loading ... `;
+      };
+
+      const CopyIcon = () => html`
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          data-prefix="far"
+          data-icon="copy"
+          class="svg-inline--fa fa-copy fa-w-14"
+          role="img"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 448 512"
+        >
+          <path
+            fill="currentColor"
+            d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"
+          ></path>
+        </svg>
+      `;
+
+      const RedoIcon = () =>
+        html`
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fas"
+            data-icon="redo"
+            class="svg-inline--fa fa-redo fa-w-16"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="currentColor"
+              d="M500.33 0h-47.41a12 12 0 0 0-12 12.57l4 82.76A247.42 247.42 0 0 0 256 8C119.34 8 7.9 119.53 8 256.19 8.1 393.07 119.1 504 256 504a247.1 247.1 0 0 0 166.18-63.91 12 12 0 0 0 .48-17.43l-34-34a12 12 0 0 0-16.38-.55A176 176 0 1 1 402.1 157.8l-101.53-4.87a12 12 0 0 0-12.57 12v47.41a12 12 0 0 0 12 12h200.33a12 12 0 0 0 12-12V12a12 12 0 0 0-12-12z"
+            ></path>
+          </svg>
+        `;
+
+      const PictureIcon = () =>
+        html`
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="far"
+            data-icon="images"
+            class="svg-inline--fa fa-images fa-w-18"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 576 512"
+          >
+            <path
+              fill="currentColor"
+              d="M480 416v16c0 26.51-21.49 48-48 48H48c-26.51 0-48-21.49-48-48V176c0-26.51 21.49-48 48-48h16v48H54a6 6 0 0 0-6 6v244a6 6 0 0 0 6 6h372a6 6 0 0 0 6-6v-10h48zm42-336H150a6 6 0 0 0-6 6v244a6 6 0 0 0 6 6h372a6 6 0 0 0 6-6V86a6 6 0 0 0-6-6zm6-48c26.51 0 48 21.49 48 48v256c0 26.51-21.49 48-48 48H144c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h384zM264 144c0 22.091-17.909 40-40 40s-40-17.909-40-40 17.909-40 40-40 40 17.909 40 40zm-72 96l39.515-39.515c4.686-4.686 12.284-4.686 16.971 0L288 240l103.515-103.515c4.686-4.686 12.284-4.686 16.971 0L480 208v80H192v-48z"
+            ></path>
+          </svg>
+        `;
+
+      const GitHubIcon = () =>
+        html`
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fab"
+            data-icon="github"
+            class="svg-inline--fa fa-github fa-w-16"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 496 512"
+          >
+            <path
+              fill="currentColor"
+              d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"
+            ></path>
+          </svg>
+        `;
+
+      const Alert = ({ text }) => html`<div class="alert">${text}</div>`;
+
+      const Header = () => html`<div class="header"><h1>lgtm</h1></div>`;
+
+      const GhPlug = () =>
+        html`<div class="gh-plug">
+          <a
+            href="https://github.com/wilt00/lgtm"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><${GitHubIcon} /><span> wilt00/lgtm</span></a
+          >
+        </div>`;
+
+      const IconButtonWithTooltip = ({
+        onClick,
+        label,
+        icon,
+        automationId,
+      }) => {
+        const btnRef = useRef();
+        const tipRef = useRef();
+        const tooltipId = uniqueId();
+        let popperInstance;
+
+        useEffect(() => {
+          if (btnRef.current && tipRef.current) {
+            popperInstance = createPopper(btnRef.current, tipRef.current, {
+              placement: "bottom",
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: [0, 8],
+                  },
+                },
+              ],
+            });
+
+            const showTooltip = () => {
+              tipRef.current.setAttribute("data-show", "");
+              popperInstance.update();
+            };
+            const hideTooltip = () => {
+              tipRef.current.removeAttribute("data-show");
+            };
+
+            btnRef.current.addEventListener("mouseenter", showTooltip);
+            btnRef.current.addEventListener("focus", showTooltip);
+            btnRef.current.addEventListener("mouseleave", hideTooltip);
+            btnRef.current.addEventListener("blur", hideTooltip);
+          }
+        }, [btnRef, tipRef]);
+        return html`
+          <button
+            ref=${btnRef}
+            onclick=${onClick}
+            aria-labelledby=${tooltipId}
+            data-automation-id=${automationId}
+          >
+            ${icon}
+          </button>
+          <div role="tooltip" class="tooltip" id=${tooltipId} ref=${tipRef}>
+            ${label}
+            <div class="toolip-arrow" data-popper-arrow></div>
+          </div>
+        `;
+      };
+
+      const LgtmControls = ({ onCopy, onReroll }) => {
+        return html`
+          <div class="lgtm-controls">
+            <${IconButtonWithTooltip}
+              automationId="copyText"
+              onClick=${() => onCopy("TEXT")}
+              label="Copy text to clipboard"
+              icon=${html`<${CopyIcon} />`}
+            />
+            <${IconButtonWithTooltip}
+              automationId="copyImage"
+              onClick=${() => onCopy("IMAGE")}
+              label="Copy image to clipboard"
+              icon=${html`<${PictureIcon} />`}
+            /><${IconButtonWithTooltip}
+              automationId="reroll"
+              onClick=${onReroll}
+              label="New LGTM"
+              icon=${html`<${RedoIcon} />`}
+            />
+          </div>
+        `;
+      };
+
+      const App = () => {
+        const [loading, setLoading] = useState(undefined);
+        const [text, setText] = useState(undefined);
+        const [effectEnabled, setEffectEnabled] = useState(true);
+        const [darkMode, setDarkMode] = useState(false);
+        const [alert, setAlert] = useState(undefined);
+        const alertTimeout = 2000;
+
+        useEffect(() => {
+          const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          );
+          setEffectEnabled(!reducedMotion.matches);
+          reducedMotion.addEventListener("change", () => {
+            setEffectEnabled(!reducedMotion.matches);
+          });
+
+          const preferredColorScheme = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          );
+          setDarkMode(preferredColorScheme.matches);
+          preferredColorScheme.addEventListener("change", () => {
+            setDarkMode(preferredColorScheme.matches);
+          });
+        }, []);
+
+        useEffect(() => {
+          setLoading(true);
+          init().then(() => {
+            setLoading(false);
+            newLgtm();
+          });
+        }, []);
+
+        useEffect(() => {
+          if (alert) {
+            setTimeout(() => setAlert(undefined), alertTimeout);
+          }
+        }, [alert]);
+
+        const newLgtm = () => {
+          setText(lgtm());
+        };
+
+        const onCopy = (type) => {
+          const copyText = () => {
+            navigator.clipboard
+              .writeText(text)
+              .then(() => {
+                setAlert("Copied to clipboard");
+              })
+              .catch(() => {
+                setAlert("Failed to copy to clipboard");
+              });
+          };
+
+          const copyImage = () => {
+            html2canvas(document.getElementById("lgtm-box")).then(function (
+              canvas
+            ) {
+              document.body.appendChild(canvas);
+              canvas.toBlob(function (blob) {
+                const item = new ClipboardItem({ "image/png": blob });
+                navigator.clipboard
+                  .write([item])
+                  .then(() => {
+                    setAlert("Copied to clipboard");
+                    canvas.remove();
+                  })
+                  .catch(() => {
+                    setAlert("Failed to copy to clipboard");
+                    canvas.remove();
+                  });
+              });
+            });
+          };
+
+          switch (type) {
+            case "IMAGE":
+              copyImage();
+              break;
+            case "TEXT":
+              copyText();
+          }
+        };
+
+        return html`
+          <div class="wrapper">
+            <${GhPlug} />
+            <div id="lgtm-box" class="lgtm-box">
+              <${Header} />
+              ${loading
+                ? html`<${Loading} />`
+                : html`
+                    <div class="lgtm-text">
+                      ${effectEnabled
+                        ? html`<${TypingEffect} text="${text}" />`
+                        : html`<h2>${text}</h2>`}
+                    </div>
+                  `}
+            </div>
+            <${LgtmControls} onCopy="${onCopy}" onReroll="${newLgtm}" />
+          </div>
+          ${alert && html`<${Alert} text=${alert} />`}
+        `;
+      };
+
+      render(html`<${App} />`, document.getElementById("app"));
+    </script>
+  </body>
+</html>
