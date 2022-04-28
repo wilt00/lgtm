@@ -2,10 +2,12 @@
   "name": "tests",
   "scripts": {
     "test": "playwright test",
-    "serve": "serve ../web"
+    "serve": "serve ../web",
+    "setup-playwright": "playwright install --with-deps"
   },
   "devDependencies": {
-    "@playwright/test": "1.16.3",
-    "serve": "13.0.2"
+    "serve": "13.0.2",
+    "@playwright/test": "1.20.2",
+    "playwright": "1.20.2"
   }
 }
